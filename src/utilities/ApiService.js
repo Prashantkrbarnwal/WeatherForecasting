@@ -1,0 +1,57 @@
+const GEO_API_URL = 'https://wft-geo-db.p.rapidapi.com/v1/geo';
+const WEATHER_API_URL = 'https://api.openweathermap.org/data/3.0';
+const WEATHER_API_KEY = '800bbb0edf7c3eb36e9a6535ed63e977';
+
+// const GEO_API_OPTIONS = {
+//   method: 'GET',
+//   headers: {
+//     'X-RapidAPI-Key': '4f0dcce84bmshac9e329bd55fd14p17ec6fjsnff18c2e61917',
+//     'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com',
+//   },
+// };
+
+const GEO_API_OPTIONS = {
+  method: 'GET',
+  url: 'https://wft-geo-db.p.rapidapi.com/v1/geo/adminDivisions',
+  headers: {
+    'X-RapidAPI-Key': '64c77410c3mshc4b3b1822fad6d0p11af04jsnc6cf14fae4e9',
+    'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
+  }
+};
+
+
+
+
+export async function fetchWeatherData(lat, lon) {
+  try {
+    let [weatherPromise, forcastPromise] = await Promise.all([
+      fetch(
+        `${WEATHER_API_URL}/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
+      ),
+      fetch(
+        `${WEATHER_API_URL}/forecast?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`
+      ),
+    ]);
+
+    const weatherResponse = await weatherPromise.json();
+    const forcastResponse = await forcastPromise.json();
+    return [weatherResponse, forcastResponse];
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function fetchCities(input) {
+  try {
+    const response = await fetch(
+      `${GEO_API_URL}/cities?minPopulation=10000&namePrefix=${input}`,
+      GEO_API_OPTIONS
+    );
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+}
